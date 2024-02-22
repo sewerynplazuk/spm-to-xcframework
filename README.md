@@ -12,3 +12,5 @@ Running `bazelisk build DequeModule-xcframework --@build_bazel_rules_apple//appl
 ```
 in apple_static_xcframework rule //:DequeModule-xcframework: target '@@swiftpkg_swift_collections//:_CollectionsUtilities.rspm' is not visible from target '//:DequeModule-xcframework'. Check the visibility declaration of the former target if you think the dependency is legitimate
 ```
+
+Since [rules_swift_package_manager](https://github.com/cgrindel/rules_swift_package_manager) does not provide access to the `@swiftpkg_swift_collections//:_CollectionsUtilities.rspm` target, we are unable to distribute any of the modules. The `DequeModule`, because we need to pass reference to the `_CollectionsUtilities` in the `avoid_deps` parameter. The `_CollectionsUtilities`, because the target is hidden.
