@@ -1,0 +1,63 @@
+load("@bazel_gazelle//:def.bzl", "gazelle", "gazelle_binary")
+load("@rules_swift_package_manager//swiftpkg:defs.bzl", "swift_update_packages")
+load("@build_bazel_rules_apple//apple:apple.bzl", "apple_static_xcframework")
+
+## SPM rules setup
+
+gazelle_binary(
+    name = "gazelle_bin",
+    languages = [
+        "@rules_swift_package_manager//gazelle",
+    ],
+)
+
+swift_update_packages(
+    name = "update_packages",
+    gazelle = ":gazelle_bin",
+    generate_swift_deps_for_workspace = False,
+    update_bzlmod_stanzas = False,
+)
+
+gazelle(
+    name = "update_build_files",
+    gazelle = ":gazelle_bin",
+)
+
+## Packaging rules
+
+MIN_OS_VERSIONS = {
+    "ios": "13.0",
+}
+
+IOS = {
+    "simulator": [
+        "x86_64",
+        "arm64",
+    ],
+    "device": ["arm64"],
+}
+
+apple_static_xcframework(
+    name = "DequeModule-xcframework",
+    deps = [
+        "@swiftpkg_swift_collections//:DequeModule",
+    ],
+    avoid_deps = [
+        "@swiftpkg_swift_collections//:_CollectionsUtilities.rspm",
+    ],
+    bundle_name = "DequeModule",
+    ios = IOS,
+    minimum_os_versions = MIN_OS_VERSIONS,
+    visibility = ["//visibility:public"],
+)
+
+apple_static_xcframework(
+    name = "_CollectionsUtilities-xcframework",
+    deps = [
+        "@swiftpkg_swift_collections//:_CollectionsUtilities.rspm",
+    ],
+    bundle_name = "_CollectionsUtilities",
+    ios = IOS,
+    minimum_os_versions = MIN_OS_VERSIONS,
+    visibility = ["//visibility:public"],
+)
